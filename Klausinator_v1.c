@@ -19,26 +19,10 @@ void drive_straight()
 }
 
 
-void liniefolgen()
+void reverse_straight()
 {
-  if (Sensor(IN_2) <= Sensor(IN_1))
-   {                                            //Rechts
-   right_turn();
-   }
-   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
-
-   
-   if (Sensor(IN_2) <= Sensor(IN_3))            //Links
-   {
-    left_turn();
-   }
-   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
-
-   
-   while (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3))
-   {
-    drive_straight();
-   }
+  OnBwd(OUT_A, 20);
+  OnBwd(OUT_C, 20);
 }
 
 
@@ -49,6 +33,35 @@ void turn_around()
   right_turn();
   }
 }
+
+
+void liniefolgen()
+{
+  while (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3))
+   {
+    drive_straight();
+   }
+
+  if (Sensor(IN_2) <= Sensor(IN_1))
+   {                                            //Rechts
+   right_turn();
+   }
+   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
+
+
+  if (Sensor(IN_2) <= Sensor(IN_3))            //Links
+   {
+    left_turn();
+   }
+   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
+
+  if (Sensor(IN_2) == Sensor(IN_1) && Sensor(IN_2) == Sensor(IN_3))
+   {
+    reverse_straight();
+   }
+
+}
+
 
 task main()
 {
