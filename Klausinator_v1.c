@@ -1,6 +1,8 @@
+int counter = 0;
+
 void right_turn()
 {
-  OnFwd(OUT_A, 5);
+  OnRev(OUT_A, 45);
   OnFwd(OUT_C, 45);
 }
 
@@ -8,58 +10,59 @@ void right_turn()
 void left_turn()
 {
   OnFwd(OUT_A, 45);
-  OnFwd(OUT_C, 5);
+  OnRev(OUT_C, 45);
 }
 
 
 void drive_straight()
 {
- OnFwd(OUT_A, 30);
- OnFwd(OUT_C, 30);
+ OnFwd(OUT_A, 35);
+ OnFwd(OUT_C, 35);
 }
 
 
 void reverse_straight()
 {
-  OnBwd(OUT_A, 20);
-  OnBwd(OUT_C, 20);
+  OnRev(OUT_A, 35);
+  OnRev(OUT_C, 35);
 }
 
 
 void turn_around()
 {
-  while (Sensor(IN_1) > Sensor(IN_2) && Sensor(IN_1 > Sensor(IN_3)))
+ if (true)
   {
-  right_turn();
+  OnFwd(OUT_C, 35);
+  OnRev(OUT_A, 35);
+  until (Sensor(IN_1) < Sensor(IN_2));
   }
 }
 
 
 void liniefolgen()
 {
-  while (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3))
+  while (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3))
    {
     drive_straight();
    }
 
-  if (Sensor(IN_2) <= Sensor(IN_1))
+  if (Sensor(IN_2) >= Sensor(IN_1))
    {                                            //Rechts
    right_turn();
+   until (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3));
    }
-   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
 
 
-  if (Sensor(IN_2) <= Sensor(IN_3))            //Links
+  if (Sensor(IN_2) >= Sensor(IN_3))            //Links
    {
     left_turn();
+    until (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3));
    }
-   until (Sensor(IN_2) > Sensor(IN_1) && Sensor(IN_2) > Sensor(IN_3));
 
-  if (Sensor(IN_2) == Sensor(IN_1) && Sensor(IN_2) == Sensor(IN_3))
+  while (Sensor(IN_2) == Sensor(IN_1) && Sensor(IN_2) == Sensor(IN_3))
    {
     reverse_straight();
    }
-
 }
 
 
@@ -68,16 +71,28 @@ task main()
  SetSensorLight(IN_1);
  SetSensorLight(IN_2);
  SetSensorLight(IN_3);
- SetSensorDistance(IN_4);
+ SetSensorLowspeed(IN_4);
+ SetSensorMode(IN_4, SENSOR_MODE_BOOL);
+ 
 
- while (SensorDistance(IN_4) > entfernung)
+while (true){
+int us_distance = SensorUS(IN_4);
+ if (us_distance < 500)
  {
- liniefolgen();
+  liniefolgen();
  }
 
- if (SensorDistance(IN_4) < entfernung)
+ if ((us_distance > 500) && counter == 0)
   {
+    PlaySound(SOUND_UP);
     turn_around();
+    counter += 1;
+  }                ;
+  
+  if ((us_distance > 500) && counter == 1 )
+  {
+   Wait(5000);
+   counter += 1;
   }
-
+  }
 }
