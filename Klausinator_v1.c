@@ -30,12 +30,9 @@ void reverse_straight()
 
 void turn_around()
 {
- if (true)
-  {
   OnFwd(OUT_C, 35);
   OnRev(OUT_A, 35);
   until (Sensor(IN_1) < Sensor(IN_2));
-  }
 }
 
 
