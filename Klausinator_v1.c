@@ -1,3 +1,7 @@
+#define RECHTS  IN_1
+#define MITTE   IN_2
+#define LINKS   IN_3
+
 int counter = 0;
 
 void right_turn()
@@ -32,31 +36,31 @@ void turn_around()
 {
   OnFwd(OUT_C, 35);
   OnRev(OUT_A, 35);
-  until (Sensor(IN_1) < Sensor(IN_2));
+  until (Sensor(RECHTS) < Sensor(MITTE));
 }
 
 
 void liniefolgen()
 {
-  while (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3))
+  while (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS))
    {
     drive_straight();
    }
 
-  if (Sensor(IN_2) >= Sensor(IN_1))
+  if (Sensor(MITTE) >= Sensor(RECHTS))
    {                                            //Rechts
    right_turn();
-   until (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3));
+   until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
    }
 
 
-  if (Sensor(IN_2) >= Sensor(IN_3))            //Links
+  if (Sensor(MITTE) >= Sensor(LINKS))            //Links
    {
     left_turn();
-    until (Sensor(IN_2) < Sensor(IN_1) && Sensor(IN_2) < Sensor(IN_3));
+    until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
    }
 
-  while (Sensor(IN_2) == Sensor(IN_1) && Sensor(IN_2) == Sensor(IN_3))
+  while (Sensor(MITTE) == Sensor(RECHTS) && Sensor(MITTE) == Sensor(LINKS))
    {
     reverse_straight();
    }
@@ -65,9 +69,9 @@ void liniefolgen()
 
 task main()
 {
- SetSensorLight(IN_1);
- SetSensorLight(IN_2);
- SetSensorLight(IN_3);
+ SetSensorLight(RECHTS);
+ SetSensorLight(MITTE);
+ SetSensorLight(LINKS);
  SetSensorLowspeed(IN_4);
  SetSensorMode(IN_4, SENSOR_MODE_BOOL);
  
