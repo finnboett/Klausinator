@@ -54,7 +54,7 @@ void turn_around()
 
 void liniefolgen()  // schwarz ist kleiner!!!
 {
-  //Geradeaus fahren, wenn alle weiß sind
+  //Geradeaus fahren, wenn alle weiÃŸ sind
   if (Sensor(MITTE) > 25 && Sensor(LINKS) > 25 && Sensor(RECHTS) > 25)
    {
     drive_straight();
@@ -81,7 +81,7 @@ void liniefolgen()  // schwarz ist kleiner!!!
     until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
    }
 
-  //Rückwärts fahren, wenn alle Sensorwerte gleich sind
+  //RÃ¼ckwÃ¤rts fahren, wenn alle Sensorwerte gleich sind
   while (Sensor(MITTE) == Sensor(RECHTS) && Sensor(MITTE) == Sensor(LINKS))
    {
     reverse_straight();
@@ -108,22 +108,22 @@ task main()
 
 
     //Wenn der Weg frei ist, der Linie folgen
-    while (counter == 0)
+    while (counter == 0)    //Klausi fÃ¤hrt als erstes normal 
     {
       liniefolgen();
 
-      while (SensorUS(DIST) < 30 && counter == 0)
+      while (SensorUS(DIST) < 30 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die nÃ¤her als 30 ist wird der nÃ¤chste schritt ausgelÃ¶st
       {
        PlaySound(SOUND_UP);
        counter = 1;
       }
     }
 
-    //Bei erstem Hindernis umdrehen und Counter erhöhen
+    //Bei erstem Hindernis umdrehen und Counter erhÃ¶hen
     while (counter == 1)
     {
       turn_around();
-      while (Sensor(RECHTS) < Sensor(MITTE) && counter == 1)
+      while (Sensor(RECHTS) < Sensor(MITTE) && counter == 1)    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
          {
           PlaySound(SOUND_DOWN);
           counter = 2;
@@ -132,26 +132,33 @@ task main()
     }
     
     while (counter == 2)
-    {
+   {
       liniefolgen();
 
-      while (SensorUS(DIST) < 30 && counter == 2)
+      while (SensorUS(DIST) < 30 && counter == 2)     // das Zweite mal wenn Klausi etwas vor der Nase hat soll er anhalten, bis die SChranke wieder auf geht.
       {
        counter = 3;
        until (counter = 3);
       }
     }
 
-    //Bei zweitem Hindernis für 5 Sekunden warten
+    //Bei zweitem Hindernis fÃ¼r 5 Sekunden warten
     while (counter == 3)
     {
       PlaySound(SOUND_UP);
       OnRev(OUT_A, 0);
       OnFwd(OUT_C, 0);
+      while (SensorUS(DIST) > 30 && counter == 3)
+      {
       counter = 4;
+      }
       until (counter = 4);
-    }
-
-    //Was passiert, wenn Klausinator auf ein Hindernis trifft und der Counter größer als 1 ist?
+      }
+    
+    while (counter == 4)
+      {
+      liniefolgen();
+      }
   }
+  
 }
