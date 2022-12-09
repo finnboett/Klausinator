@@ -1,4 +1,4 @@
-i/////////////////////////////////////////////
+/////////////////////////////////////////////
 //             Definitionen                //
 ////////////////////////////////////////////
 
@@ -45,83 +45,32 @@ void turn_around()
 {
   if (counter == 1)
   {
-    OnRev(OUT_A, 100);
-    OnFwd(OUT_C, 100);
-    if (Sensor(RECHTS) < Sensor(MITTE))    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
-    {
-      PlaySound(SOUND_DOWN);
-      counter = 2;
-      until (counter == 2);
-    }
-    until(counter == 2);
+  OnRev(OUT_A, 100);
+  OnFwd(OUT_C, 100);
+  until (Sensor(RECHTS) < Sensor(MITTE));
   }
 
-}
-
-void break_wait()
-{
-  if (counter == 3)
-  {
-    OnRev(OUT_A, 0);
-    OnFwd(OUT_C, 0);
-    if (SensorUS(DIST) > 30)
-    {
-      counter = 4;
-      until (counter == 4);
-    }
-    until (counter = 4);
-  }
-}
-
-void counter_addition()
-{
- if (SensorUS(DIST) < 30 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die näher als 30 ist wird der nächste schritt ausgelöst
-  {
-    PlaySound(SOUND_UP);
-    counter = 1;
-    until (counter == 1);
-  }
-  if (SensorUS(DIST) < 30 && counter == 2)     // das Zweite mal wenn Klausi etwas vor der Nase hat soll er anhalten, bis die SChranke wieder auf geht.
-  {
-    PlaySound(SOUND_DOWN);
-    counter = 3;
-    until (counter = 3);
-  } 
 }
 
 void liniefolgen()  // schwarz ist kleiner!!!
 {
   //Geradeaus fahren, wenn alle weiß sind
-  if (Sensor(MITTE) > 20 && Sensor(LINKS) > 20 && Sensor(RECHTS) > 20)
-  {
+  if (Sensor(MITTE) > 25 && Sensor(LINKS) > 25 && Sensor(RECHTS) > 25)
+   {
     drive_straight();
-    counter_addition();
-    until (Sensor(MITTE) < 25 || Sensor(LINKS) < 25 || Sensor(RECHTS) < 25);  // wenn dann wieder Linie da ist soll er Normal der Linie Folgen
-  }
+    until (Sensor(MITTE) < 25 || Sensor(LINKS) < 25 || Sensor(RECHTS) < 25)  // wenn dann wieder Linie da ist soll er Normal der Linie Folgen
+    }
 
     //Geradeausfahren, wenn der mittlere Sensor auf dr schwarzen Linie ist
   while (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS))
    {
     drive_straight();
-    if (SensorUS(DIST) < 30 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die näher als 30 ist wird der nächste schritt ausgelöst
-      {
-       PlaySound(SOUND_UP);
-       counter = 1;
-       break;
-      }
-    if (SensorUS(DIST) < 30 && counter == 2)     // das Zweite mal wenn Klausi etwas vor der Nase hat soll er anhalten, bis die SChranke wieder auf geht.
-      {
-       counter = 3;
-       until (counter = 3);
-       break;
-      }
    }
 
   //Wenn der rechte Sensor auf der schwarzen Linie ist, nach rechts drehen
   if (Sensor(MITTE) >= Sensor(RECHTS))
    {                                            //Rechts
     right_turn();
-    counter_addition();
     until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
    }
 
@@ -129,9 +78,15 @@ void liniefolgen()  // schwarz ist kleiner!!!
   if (Sensor(MITTE) >= Sensor(LINKS))            //Links
    {
     left_turn();
-    counter_addition();
     until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
    }
+
+  //Rückwärts fahren, wenn alle Sensorwerte gleich sind
+  while (Sensor(MITTE) == Sensor(RECHTS) && Sensor(MITTE) == Sensor(LINKS))
+   {
+    reverse_straight();
+   }
+
 }
 
 /////////////////////////////////////////////
@@ -156,24 +111,49 @@ task main()
     while (counter == 0)    //Klausi fährt als erstes normal 
     {
       liniefolgen();
+
+      while (SensorUS(DIST) < 30 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die näher als 30 ist wird der nächste schritt ausgelöst
+      {
+       PlaySound(SOUND_UP);
+       counter = 1;
+      }
     }
 
     //Bei erstem Hindernis umdrehen und Counter erhöhen
     while (counter == 1)
     {
       turn_around();
+      while (Sensor(RECHTS) < Sensor(MITTE) && counter == 1)    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
+         {
+          PlaySound(SOUND_DOWN);
+          counter = 2;
+          until (counter = 2);
+         }
     }
     
     while (counter == 2)
-    {
+   {
       liniefolgen();
+
+      while (SensorUS(DIST) < 30 && counter == 2)     // das Zweite mal wenn Klausi etwas vor der Nase hat soll er anhalten, bis die SChranke wieder auf geht.
+      {
+       counter = 3;
+       until (counter = 3);
+      }
     }
 
     //Bei zweitem Hindernis für 5 Sekunden warten
     while (counter == 3)
     {
-      break_wait();
-    }
+      PlaySound(SOUND_UP);
+      OnRev(OUT_A, 0);
+      OnFwd(OUT_C, 0);
+      while (SensorUS(DIST) > 30 && counter == 3)
+      {
+      counter = 4;
+      }
+      until (counter = 4);
+      }
     
     while (counter == 4)
       {
