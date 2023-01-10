@@ -1,0 +1,190 @@
+//////////////////////////////////////////////
+//             Definitionen                //
+////////////////////////////////////////////
+
+#define RECHTS  IN_1
+#define MITTE   IN_2
+#define LINKS   IN_3
+#define DIST    IN_4
+
+/////////////////////////////////////////////
+//         Globale Variablen               //
+////////////////////////////////////////////
+
+int counter = 0;
+
+/////////////////////////////////////////////
+//             Funktionen                 //
+////////////////////////////////////////////
+
+void right_turn()
+{
+  OnRev(OUT_A, 100);
+  OnFwd(OUT_C, 100);
+}
+
+void left_turn()
+{
+  OnFwd(OUT_A, 100);
+  OnRev(OUT_C, 100);
+}
+
+void drive_straight()
+{
+ OnFwd(OUT_A, 60);
+ OnFwd(OUT_C, 60);
+}
+
+void reverse_straight()
+{
+  OnRev(OUT_A, 50);
+  OnRev(OUT_C, 50);
+}
+
+void turn_around()
+{
+  if (Sensor(RECHTS) >= Sensor(MITTE))
+  {
+    OnRev(OUT_A, 100);
+    OnFwd(OUT_C, 100);
+  }
+  if (Sensor(RECHTS) < Sensor(MITTE))    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
+    {
+      PlaySound(SOUND_DOWN);
+      counter = 2;
+      until (counter == 2);
+    }
+}
+
+void break_wait()
+{
+ if (SensorUS(DIST) < 25)
+  {
+    OnRev(OUT_A, 0);
+    OnFwd(OUT_C, 0);
+   }
+ if (SensorUS(DIST) > 25)
+    {
+      counter = 4;
+      until (counter == 4);
+    }
+}
+
+void counter_addition()
+{
+ if (SensorUS(DIST) < 25 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die n?her als 30 ist wird der n?chste schritt ausgel?st
+  {
+    PlaySound(SOUND_UP);
+    counter = 1;
+    until (counter == 1);
+  }
+  if (SensorUS(DIST) < 25 && counter == 2)     // das Zweite mal wenn Klausi etwas vor der Nase hat soll er anhalten, bis die SChranke wieder auf geht.
+  {
+    PlaySound(SOUND_DOWN);
+    counter = 3;
+    until (counter = 3);
+  }
+  if (Sensor(MITTE) < 20 && Sensor(LINKS) < 20 && Sensor(RECHTS) < 20)
+  {
+    PlaySound(SOUND_DOWN);
+    counter = 5;
+    until (counter = 5);
+  }
+}
+
+void liniefolgen()  // schwarz ist kleiner!!!
+{
+  //Geradeaus fahren, wenn alle wei? sind
+  if (Sensor(MITTE) > 30 && Sensor(LINKS) > 30 && Sensor(RECHTS) > 30)
+  {
+    drive_straight();
+    counter_addition();
+    until (Sensor(MITTE) < 30 || Sensor(LINKS) < 30 || Sensor(RECHTS) < 30);  // wenn dann wieder Linie da ist soll er Normal der Linie Folgen
+  }
+
+    //Geradeausfahren, wenn der mittlere Sensor auf dr schwarzen Linie ist
+  if (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS))
+   {
+    drive_straight();
+    counter_addition();
+   }
+
+  //Wenn der rechte Sensor auf der schwarzen Linie ist, nach rechts drehen
+  if (Sensor(MITTE) >= Sensor(RECHTS))
+   {                                            //Rechts
+    right_turn();
+    counter_addition();
+    until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
+   }
+
+  //Wenn der linke Sensor auf der schwarzen Linie ist, nach links drehen
+  if (Sensor(MITTE) >= Sensor(LINKS))            //Links
+   {
+    left_turn();
+    counter_addition();
+    until (Sensor(MITTE) < Sensor(RECHTS) && Sensor(MITTE) < Sensor(LINKS));
+   }
+}
+
+/////////////////////////////////////////////
+//             Main Funktion              //
+////////////////////////////////////////////
+
+task main()
+{
+  //Sensoren Initalisieren
+  SetSensorLight(RECHTS);
+  SetSensorLight(MITTE);
+  SetSensorLight(LINKS);
+  SetSensorUltrasonic(DIST);
+  //SetSensorMode(IN_4, SENSOR_MODE_PERCENT);
+
+  while (true){
+    //Entfernung vom Ultraschallsensor auslesen
+    int us_dist = SensorUS(IN_4);
+
+
+    //Wenn der Weg frei ist, der Linie folgen
+    while (counter == 0)    //Klausi f?hrt als erstes normal
+    {
+      liniefolgen();
+    }
+
+    //Bei erstem Hindernis umdrehen und Counter erh?hen
+    while (counter == 1)
+    {
+      turn_around();
+    }
+
+    while (counter == 2)
+    {
+      liniefolgen();
+    }
+
+    //Bei zweitem Hindernis f?r 5 Sekunden warten
+    while (counter == 3)
+    {
+      break_wait();
+    }
+
+    while (counter == 4)
+      {
+      liniefolgen();
+      }
+
+    while (counter == 5)
+    {
+     drive_straight();
+     if (SensorUS(DIST) < 6)
+     {
+        ball_throw();
+        reverse_straight();
+        if (SensorUS(DIST) < 20)
+        {
+         right_turn();
+        }
+     }
+    }
+  }
+
+}
