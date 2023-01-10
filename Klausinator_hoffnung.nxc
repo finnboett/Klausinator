@@ -70,6 +70,11 @@ void break_wait()
     }
 }
 
+void ball_throw()
+{
+  RotoateMotor(OUT_B, 5, 45);
+}
+
 void counter_addition()
 {
  if (SensorUS(DIST) < 25 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die n?her als 30 ist wird der n?chste schritt ausgel?st
