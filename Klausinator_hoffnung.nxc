@@ -72,7 +72,7 @@ void break_wait()
 
 void ball_throw()
 {
-  RotoateMotor(OUT_B, 5, 45);
+  RotateMotor(OUT_B, 100,180);
 }
 
 void counter_addition()
