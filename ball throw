@@ -98,7 +98,7 @@ void counter_addition()
     until (counter = 5);
    }
    
-  if (Sensor(MITTE) < 20 && Sensor(LINKS) < 20 && Sensor(RECHTS) < 20)   //Ball abwerfen
+  if (Sensor(MITTE) < 20 && Sensor(LINKS) < 20 && Sensor(RECHTS) < 20 && counter == 6)   //Ball abwerfen
   {
     PlaySound(SOUND_DOWN);
     counter = 8;
@@ -145,6 +145,7 @@ void block_pushing()
  drive_straight();
  Wait(500);
  right_turn();
+ Wait(100);
  if (Sensor(RECHTS) < Sensor(MITTE))    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
     {
       liniefolgen();
