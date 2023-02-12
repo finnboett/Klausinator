@@ -13,6 +13,7 @@
 
 int counter = 0;
 int w_counter = 0;
+int dance_counter = 0;
 
 /////////////////////////////////////////////
 //             Funktionen                 //
@@ -81,6 +82,7 @@ void ball_throw()
   Wait(1000);
   OnRev(OUT_B, 0);
   Wait(1000);
+  dance_counter += 1;
 }
 
 void counter_addition()
@@ -117,6 +119,11 @@ void counter_addition()
     PlaySound(SOUND_DOWN);
     counter = 8;
     //until (counter = 8);
+  }
+  
+  if (counter == 9 && dance_counter == 7)
+  {
+  counter = 10;
   }
 }
 
@@ -157,7 +164,7 @@ void liniefolgen()  // schwarz ist kleiner!!!
 void block_pushing()
 {
  right_turn();
- Wait(1000);
+ Wait(100);
  if (Sensor(RECHTS) < Sensor(MITTE))    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
     {
       liniefolgen();
@@ -237,7 +244,7 @@ task main()
     {
      ball_throw();
      reverse_straight();
-     Wait(1500);
+     Wait(2000);
      counter = 9;
      }
     while (counter == 9)
@@ -245,6 +252,10 @@ task main()
          right_turn();
          ball_throw();
         }
+    while (counter == 10)
+    {
+    break;
+    }
   }
 
 }
