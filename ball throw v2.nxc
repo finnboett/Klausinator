@@ -91,8 +91,6 @@ void counter_addition()
     {
     PlaySound(SOUND_UP);
     w_counter += 1;
-    drive_straight();
-    Wait(100);
     }
  if (SensorUS(DIST) < 30 && counter == 0)   //Wenn der Sensor das erste mal eine Wand die n?her als 30 ist wird der n?chste schritt ausgel?st
   {
@@ -164,7 +162,6 @@ void liniefolgen()  // schwarz ist kleiner!!!
 void block_pushing()
 {
  right_turn();
- Wait(100);
  if (Sensor(RECHTS) < Sensor(MITTE))    // Wenn der rechte Sonsor wieder auf schwarz ist soll Klausi wieder der Linie folgen
     {
       liniefolgen();
@@ -172,8 +169,8 @@ void block_pushing()
       {
        reverse_straight();
        Wait(4000);
-       right_turn();
-       if (Sensor(RECHTS) < Sensor(MITTE))
+       left_turn();
+       if (Sensor(LINKS) < Sensor(MITTE))
        {
         PlaySound(SOUND_DOWN);
         counter = 6;
