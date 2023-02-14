@@ -106,7 +106,14 @@ void counter_addition()
     counter = 3;
     until (counter = 3);
   }
-  if (counter == 4 && w_counter == 2)     //Block weg schieben
+  if (counter == 4 && w_counter == 1)
+  {
+  drive_straight();
+  Wait(500);
+  w_counter = 2;
+  }
+  
+  if (counter == 4 && w_counter == 3)     //Block weg schieben
    {
     PlaySound(SOUND_DOWN);
     reverse_straight();
